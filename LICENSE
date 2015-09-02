@@ -1,0 +1,35 @@
+                                expr
+                   Calculates Arithmetic Expression
+
+This program is written by the authors below. Please respect all licensing
+terms. The libraries used by the program are made available by their authors and
+are specified in gradle.build. Distributing those libraries with this code
+constitutes a combined work. It is up to the distributor of such a combined work
+to ensure all licensing terms are respected.
+
+By Tim Henderson (tadh@case.edu)
+
+Copyright (c) 2015
+Tim Henderson
+Case Western Reserve University
+Cleveland, Ohio 44106
+All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this library; if not, write to the
+  Free Software Foundation, Inc.,
+  51 Franklin Street, Fifth Floor,
+  Boston, MA  02110-1301
+  USA
+
+
