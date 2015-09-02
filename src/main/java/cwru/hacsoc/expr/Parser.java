@@ -21,14 +21,30 @@ package cwru.hacsoc.expr;
  */
 
 import java.lang.StringBuilder;
+import java.lang.NumberFormatException;
 
 public class Parser {
 
     public static class Error extends Exception {
         public Match match;
         public Error(String msg, Match m) {
-            super(String.format("Parse error at %s : %s", m, msg));
+            super(format(msg, m));
             this.match = m;
+        }
+        static String format(String msg, Match m) {
+            if (m != null) {
+                return String.format("Parse error at %s : %s", m, msg);
+            } else {
+                return String.format("Parse error : %s", msg);
+            }
+        }
+    }
+
+    public static class LexerError extends Error {
+        Lexer.Error e;
+        public LexerError(Lexer.Error e) {
+            super(e.toString(), null);
+            this.e = e;
         }
     }
 
@@ -58,11 +74,16 @@ public class Parser {
         this.lex = lex;
     }
 
-    public static Node Parse(Lexer l) throws Lexer.Error, Error {
+    public static Node Parse(Lexer l) throws Error {
         Parser p = new Parser(l);
-        Node t = p.Expr();
-        if (!l.EOF()) {
-            throw new UnconsumedInput(l.peek());
+        Node t;
+        try {
+            t = p.Expr();
+            if (!l.EOF()) {
+                throw new UnconsumedInput(l.peek());
+            }
+        } catch (Lexer.Error e) {
+            throw new LexerError(e);
         }
         return t;
     }
@@ -71,15 +92,30 @@ public class Parser {
         if (extra == null) {
             return subtree;
         }
+        // extra == T
+        //         / \
+        //       op   root
+        //             .
+        //             .
+        //             .
+        //          op
+        // returns
+        //           root
+        //             .
+        //             .
+        //             .
+        //          op
+        //            \
+        //             subtree
         Node op = (Node)extra.kids.get(0);
         op.kids.add(0, subtree);
         return (Node)extra.kids.get(1);
     }
 
-    Node swing(Node a, Node b, Node c) {
+    Node swing(Node op, Node left, Node extra) {
         return (new Node("T"))
-                    .addkid(a)
-                    .addkid(collapse(a.addkid(b), c));
+                    .addkid(op)
+                    .addkid(collapse(op.addkid(left), extra));
     }
 
     Node Expr() throws Lexer.Error, Error {
@@ -90,7 +126,7 @@ public class Parser {
         Match m = lex.peek();
         switch (m.token) {
             case PLUS: case DASH:
-                return swing(new Node(lex.next().lexeme), Term(), Expr_());
+                return swing(new Node<String>(lex.next().lexeme), Term(), Expr_());
             default: // epsilon
                 return null;
         }
@@ -104,7 +140,7 @@ public class Parser {
         Match m = lex.peek();
         switch (m.token) {
             case STAR: case SLASH:
-                return swing(new Node(lex.next().lexeme), Unary(), Term_());
+                return swing(new Node<String>(lex.next().lexeme), Unary(), Term_());
             default: // epsilon
                 return null;
         }
@@ -114,7 +150,7 @@ public class Parser {
         Match m = lex.peek();
         switch (m.token) {
             case DASH:
-                return (new Node(lex.next().lexeme)).addkid(Factor());
+                return (new Node<String>(lex.next().lexeme)).addkid(Factor());
             default:
                 return Factor();
         }
@@ -124,7 +160,7 @@ public class Parser {
         Match m = lex.peek();
         switch (m.token) {
             case NUMBER:
-                return new Node(lex.next().lexeme);
+                return new Node<Integer>(atoi(lex.next()));
             case LPAREN:
                 lex.next();
                 Node e = Expr();
@@ -135,6 +171,14 @@ public class Parser {
                 return e;
             default:
                 throw new UnexpectedToken(m, Tokens.NUMBER, Tokens.LPAREN);
+        }
+    }
+
+    Integer atoi(Match m) throws Error {
+        try {
+            return Integer.parseInt(m.lexeme);
+        } catch (NumberFormatException e) {
+            throw new Error(String.format("Could not parse number from match : %s", e), m);
         }
     }
 }
