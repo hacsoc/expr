@@ -13,7 +13,7 @@ public class Calculator {
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Expected exactly one expression");
-            System.err.println("Ex: java Calculator '1 + 2 * 3'");
+            System.err.println("Ex: expr '1 + 2 * 3'");
             System.exit(1);
         }
 
