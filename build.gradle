@@ -1,0 +1,49 @@
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'jacoco'
+
+sourceCompatibility = 1.7
+
+mainClassName = 'cwru.hacsoc.expr.Calculator'
+
+dependencies {
+    compile 'commons-cli:commons-cli:1.2'
+    compile 'org.slf4j:slf4j-api:1.7.7'
+
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.hamcrest:hamcrest-all:1.3'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+        events "passed", "skipped", "failed"
+        exceptionFormat "full" // default is "short"
+    }
+}
+
+jacoco {
+    reportsDir = file("$buildDir/coverage")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/coverage"
+    }
+}
+
+task coverage(dependsOn: 'jacocoTestReport')
+
+
