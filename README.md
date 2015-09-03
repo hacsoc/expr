@@ -31,7 +31,7 @@ You must have java 1.7+ and git on your system. Get those first!
     (+ 1 2)
     3
 
-To make it availabl for this session run
+To make it available for this session run
 
     $ export PATH=$(pwd)/build/install/expr/bin:$PATH
 
